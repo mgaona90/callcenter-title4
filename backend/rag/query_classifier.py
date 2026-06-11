@@ -47,12 +47,12 @@ Triggers (any one is sufficient):
   • Anything requiring review of a specific student's documents
 
 Respond ONLY with valid JSON — no markdown, no prose:
-{
+{{
   "tier": 1 | 2 | 3,
   "confidence": <float 0.0–1.0>,
   "reasoning": "<one sentence>",
   "escalation_reason": "<null or short reason if tier 3>"
-}
+}}
 
 User query: {query}"""
 
