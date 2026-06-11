@@ -245,53 +245,48 @@ with col_chat:
     # Render conversation history
     for turn in st.session_state.messages:
         if turn["role"] == "user":
-            st.markdown(
-                f'<div class="user-message"><strong>You:</strong> {turn["content"]}</div>',
-                unsafe_allow_html=True,
-            )
+            with st.chat_message("user"):
+                st.write(turn["content"])
         else:
-            if turn.get("escalated"):
-                st.markdown(
-                    f'<div class="escalation-box">'
-                    f'<strong>⚠ Transfer to Advisor</strong><br><br>{turn["content"]}'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.markdown(
-                    f'<div class="agent-message"><strong>Alex (Financial Aid):</strong><br><br>{turn["content"]}</div>',
-                    unsafe_allow_html=True,
-                )
+            with st.chat_message("assistant", avatar="🎓"):
+                if turn.get("escalated"):
+                    st.warning("**Transfer to Advisor**\n\n" + turn["content"])
+                else:
+                    st.write(turn["content"])
 
-    # Input
-    st.markdown("---")
-    with st.form("chat_form", clear_on_submit=True):
-        # Check for pre-filled query from sidebar button
-        default_val = st.session_state.pop("_pending_query", "")
-        user_input = st.text_input(
-            "Your question:",
-            value=default_val,
-            placeholder="e.g. What is the FAFSA federal deadline?",
-            label_visibility="collapsed",
-        )
-        submitted = st.form_submit_button("Send", use_container_width=True)
+    # Handle pending query from sidebar sample buttons
+    pending = st.session_state.pop("_pending_query", None)
 
-    if submitted and user_input.strip():
-        query = user_input.strip()
+    # Native chat input — reliable across all Streamlit versions
+    user_input = st.chat_input("Ask about FAFSA, grants, loans, enrollment...")
 
-        with st.spinner("Alex is thinking..."):
-            result = _send_message(query)
+    query = pending or user_input
 
-        if result:
-            st.session_state.messages.append({"role": "user", "content": query})
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": result["response"],
-                "escalated": result["escalated"],
-            })
-            st.session_state.last_meta = result
-            st.rerun()
-        # If result is None, st.error() already shown by _send_message — don't rerun so it stays visible
+    if query and query.strip():
+        query = query.strip()
+
+        # Show user message immediately
+        with st.chat_message("user"):
+            st.write(query)
+
+        # Get response
+        with st.chat_message("assistant", avatar="🎓"):
+            with st.spinner("Alex is thinking..."):
+                result = _send_message(query)
+
+            if result:
+                if result["escalated"]:
+                    st.warning("**Transfer to Advisor**\n\n" + result["response"])
+                else:
+                    st.write(result["response"])
+
+                st.session_state.messages.append({"role": "user", "content": query})
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": result["response"],
+                    "escalated": result["escalated"],
+                })
+                st.session_state.last_meta = result
 
 
 # ── Metadata panel ────────────────────────────────────────────────────────────

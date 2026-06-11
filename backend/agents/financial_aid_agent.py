@@ -49,12 +49,14 @@ async def generate_response(
     query: str,
     conversation_history: list[dict],
     session_id: str,
+    rag_result: RAGResult | None = None,
 ) -> str:
     """
     Generate a full (non-streaming) response for the given query.
-    Applies guardrails and Langfuse tracing.
+    Pass rag_result if already computed to avoid running the pipeline twice.
     """
-    rag_result = await run_rag_pipeline(query)
+    if rag_result is None:
+        rag_result = await run_rag_pipeline(query)
 
     # Pre-LLM guardrail check (catches Tier 3)
     pre_decision = apply_guardrails(rag_result)

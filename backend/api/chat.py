@@ -86,13 +86,14 @@ async def chat(req: ChatRequest, redis: aioredis.Redis = Depends(get_redis)):
     session_id = req.session_id or str(uuid.uuid4())
     history = await load_history(session_id, redis)
 
-    # Run RAG ahead so we can return metadata to the UI
+    # Single RAG call — result passed to agent so it's not run twice
     rag_result = await run_rag_pipeline(req.query)
 
     response_text = await generate_response(
         query=req.query,
         conversation_history=history,
         session_id=session_id,
+        rag_result=rag_result,
     )
 
     # Persist turn
