@@ -1,30 +1,40 @@
 """
 Cohere Rerank v3 — second-pass scoring of retrieved documents.
 
-Reranking is applied after hybrid retrieval to sharpen precision.
-The reranker score is also used as a proxy for retrieval confidence.
+If COHERE_API_KEY is not set, falls back to using the raw RRF scores
+from hybrid retrieval — slightly less precise but fully functional.
 """
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 
-import cohere
-
 from rag.retriever import RetrievedDocument
 
-_client: cohere.AsyncClientV2 | None = None
+logger = logging.getLogger(__name__)
+
+_client = None
+_cohere_available: bool | None = None  # None = not yet checked
 
 
-def _get_client() -> cohere.AsyncClientV2:
-    global _client
-    if _client is None:
+def _get_client():
+    global _client, _cohere_available
+    if _cohere_available is None:
         api_key = os.getenv("COHERE_API_KEY")
-        if not api_key:
-            raise RuntimeError("COHERE_API_KEY is not set")
-        _client = cohere.AsyncClientV2(api_key=api_key)
-    return _client
+        if api_key:
+            try:
+                import cohere
+                _client = cohere.AsyncClientV2(api_key=api_key)
+                _cohere_available = True
+            except ImportError:
+                logger.warning("cohere package not installed — reranker disabled")
+                _cohere_available = False
+        else:
+            logger.info("COHERE_API_KEY not set — using raw retrieval scores (no reranking)")
+            _cohere_available = False
+    return _client if _cohere_available else None
 
 
 @dataclass
@@ -41,12 +51,18 @@ async def rerank(
 ) -> list[RankedDocument]:
     """
     Rerank documents using Cohere Rerank v3.
-    Returns top_n documents sorted by rerank_score descending.
+    Falls back to RRF scores if Cohere is not configured.
     """
     if not documents:
         return []
 
     client = _get_client()
+
+    if client is None:
+        # Fallback: use existing RRF scores, just trim to top_n
+        ranked = [RankedDocument(document=d, rerank_score=d.score) for d in documents]
+        return ranked[:top_n]
+
     response = await client.rerank(
         model=model,
         query=query,
@@ -66,11 +82,14 @@ async def rerank(
 
 def compute_confidence(ranked_docs: list[RankedDocument]) -> float:
     """
-    Confidence score in [0, 1] derived from the top reranked document's score.
-    If no documents, returns 0.
+    Confidence score in [0, 1].
+    With Cohere: uses relevance score directly.
+    Without Cohere: normalizes the RRF score (typically 0.01–0.05) to 0–1 range.
     """
     if not ranked_docs:
         return 0.0
     top_score = ranked_docs[0].rerank_score
-    # Cohere rerank scores are in [0, 1]; treat > 0.8 as high confidence
+    # RRF scores are tiny (~0.016–0.033); scale them up for display
+    if top_score < 0.1:
+        top_score = min(top_score * 20, 1.0)
     return min(top_score, 1.0)
