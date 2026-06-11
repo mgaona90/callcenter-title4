@@ -60,28 +60,30 @@ st.markdown("""
         margin: 4px 0;
     }
     .agent-message {
-        background: #f0f4ff;
-        border-left: 4px solid #003087;
+        background: #1e3a5f;
+        border-left: 4px solid #4a9eff;
         padding: 1rem 1.2rem;
         border-radius: 0 8px 8px 0;
         margin: 0.5rem 0;
         font-size: 1.05rem;
         line-height: 1.6;
+        color: #e8f0fe;
     }
     .user-message {
-        background: #f9fafb;
+        background: #2d2d2d;
         border-left: 4px solid #6b7280;
         padding: 0.8rem 1.2rem;
         border-radius: 0 8px 8px 0;
         margin: 0.5rem 0;
-        color: #374151;
+        color: #d1d5db;
     }
     .escalation-box {
-        background: #fff7ed;
+        background: #3d1f00;
         border: 2px solid #f97316;
         border-radius: 10px;
         padding: 1rem 1.2rem;
         margin: 0.5rem 0;
+        color: #fed7aa;
     }
     .source-card {
         background: #f8fafc;
