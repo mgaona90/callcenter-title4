@@ -22,17 +22,20 @@ _cohere_available: bool | None = None  # None = not yet checked
 def _get_client():
     global _client, _cohere_available
     if _cohere_available is None:
-        api_key = os.getenv("COHERE_API_KEY")
-        if api_key:
+        api_key = os.getenv("COHERE_API_KEY", "").strip()
+        # Treat placeholder values as unset
+        valid = api_key and api_key not in ("...", "your_key_here", "")
+        if valid:
             try:
                 import cohere
                 _client = cohere.AsyncClientV2(api_key=api_key)
                 _cohere_available = True
+                logger.info("Cohere reranker enabled")
             except ImportError:
                 logger.warning("cohere package not installed — reranker disabled")
                 _cohere_available = False
         else:
-            logger.info("COHERE_API_KEY not set — using raw retrieval scores (no reranking)")
+            logger.info("COHERE_API_KEY not configured — using raw retrieval scores")
             _cohere_available = False
     return _client if _cohere_available else None
 
@@ -63,21 +66,22 @@ async def rerank(
         ranked = [RankedDocument(document=d, rerank_score=d.score) for d in documents]
         return ranked[:top_n]
 
-    response = await client.rerank(
-        model=model,
-        query=query,
-        documents=[d.content for d in documents],
-        top_n=top_n,
-        return_documents=False,
-    )
-
-    ranked = []
-    for result in response.results:
-        doc = documents[result.index]
-        ranked.append(RankedDocument(document=doc, rerank_score=result.relevance_score))
-
-    ranked.sort(key=lambda r: r.rerank_score, reverse=True)
-    return ranked
+    try:
+        response = await client.rerank(
+            model=model,
+            query=query,
+            documents=[d.content for d in documents],
+            top_n=top_n,
+        )
+        ranked = []
+        for result in response.results:
+            doc = documents[result.index]
+            ranked.append(RankedDocument(document=doc, rerank_score=result.relevance_score))
+        ranked.sort(key=lambda r: r.rerank_score, reverse=True)
+        return ranked
+    except Exception as exc:
+        logger.warning("Cohere rerank failed (%s) — falling back to retrieval scores", exc)
+        return [RankedDocument(document=d, rerank_score=d.score) for d in documents][:top_n]
 
 
 def compute_confidence(ranked_docs: list[RankedDocument]) -> float:
