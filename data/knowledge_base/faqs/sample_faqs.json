@@ -1,0 +1,92 @@
+[
+  {
+    "question": "What is the FAFSA?",
+    "answer": "The Free Application for Federal Student Aid (FAFSA) is the form used to apply for federal financial aid for college or career school. It collects financial information from you and your family to determine your eligibility for federal grants, work-study, and loans. Most states and colleges also use FAFSA data to award their own financial aid.",
+    "source": "StudentAid.gov — FAFSA Overview",
+    "category": "fafsa_basics"
+  },
+  {
+    "question": "When is the FAFSA deadline?",
+    "answer": "The federal FAFSA deadline is typically June 30 of the award year (e.g., June 30, 2025 for the 2024–25 award year). However, state and school deadlines are often much earlier — sometimes as early as February or March. You should check your state's deadline at StudentAid.gov and contact your school's financial aid office for their specific deadline.",
+    "source": "StudentAid.gov — FAFSA Deadlines",
+    "category": "fafsa_basics"
+  },
+  {
+    "question": "What is a Pell Grant?",
+    "answer": "A Federal Pell Grant is money from the federal government that, unlike a loan, does not have to be repaid (except under certain circumstances). Pell Grants are awarded to undergraduate students who display exceptional financial need and have not earned a bachelor's, graduate, or professional degree. The maximum Pell Grant award changes each award year. For 2024–25, the maximum is $7,395.",
+    "source": "FSA Handbook — Pell Grants",
+    "category": "grants"
+  },
+  {
+    "question": "What is the difference between subsidized and unsubsidized federal loans?",
+    "answer": "Direct Subsidized Loans are available to undergraduate students with financial need. The U.S. Department of Education pays the interest while you're in school at least half-time, during the grace period, and during deferment periods. Direct Unsubsidized Loans are available to undergraduate, graduate, and professional students regardless of financial need. You are responsible for paying all the interest on an unsubsidized loan, even during school.",
+    "source": "FSA Handbook — Federal Student Loans",
+    "category": "loans"
+  },
+  {
+    "question": "What is the Student Aid Index (SAI)?",
+    "answer": "The Student Aid Index (SAI) is a number that colleges use to determine how much federal student aid you would receive if you attended their school. It's calculated from information you provide on the FAFSA. A lower SAI generally means more financial need. The SAI replaced the Expected Family Contribution (EFC) starting with the 2024–25 FAFSA.",
+    "source": "StudentAid.gov — Understanding Aid",
+    "category": "fafsa_basics"
+  },
+  {
+    "question": "What is satisfactory academic progress (SAP)?",
+    "answer": "Satisfactory Academic Progress (SAP) is the standard a student must meet to continue receiving federal financial aid. Schools set their own SAP policies, but they must meet federal requirements. Typically, SAP policies measure: your cumulative GPA, the percentage of attempted credits you've completed, and whether you can complete your program within a maximum timeframe (usually 150% of the published program length).",
+    "source": "FSA Handbook — SAP",
+    "category": "academic_progress"
+  },
+  {
+    "question": "What documents do I need for the FAFSA?",
+    "answer": "To complete the FAFSA you'll typically need: your Social Security Number (or Alien Registration Number if not a US citizen), your federal income tax returns and W-2s (or your parents' if you're a dependent student), bank statements and records of investments, records of untaxed income, and FSA ID (username and password). You can use the IRS Data Retrieval Tool to import tax data directly.",
+    "source": "StudentAid.gov — FAFSA Checklist",
+    "category": "fafsa_basics"
+  },
+  {
+    "question": "What is Federal Work-Study?",
+    "answer": "The Federal Work-Study program provides part-time jobs for undergraduate and graduate students with financial need, allowing them to earn money to help pay for education expenses. Work-study jobs can be on-campus or off-campus, often with nonprofit organizations or public agencies. Your earnings are not counted as income on subsequent FAFSA applications.",
+    "source": "FSA Handbook — Work-Study",
+    "category": "work_study"
+  },
+  {
+    "question": "What is enrollment verification?",
+    "answer": "Enrollment verification is the process of confirming that a student is enrolled at an institution and their enrollment status (full-time, half-time, less than half-time). Universities use the National Student Clearinghouse (NSC) to report enrollment. Students can request enrollment certificates directly from their school's registrar for loan deferment, employer tuition benefits, insurance, or other purposes.",
+    "source": "National Student Clearinghouse",
+    "category": "enrollment_verification"
+  },
+  {
+    "question": "What are the interest rates for federal student loans?",
+    "answer": "Federal student loan interest rates are set by Congress each year based on the 10-year Treasury note rate plus a fixed percentage. For the 2024–25 award year: Direct Subsidized and Unsubsidized Loans for undergraduates have an interest rate of 6.53%, Direct Unsubsidized Loans for graduate students are 8.08%, and Direct PLUS Loans (for parents and graduate students) are 9.08%. Rates are fixed for the life of the loan.",
+    "source": "StudentAid.gov — Interest Rates",
+    "category": "loans"
+  },
+  {
+    "question": "What is verification and why was I selected?",
+    "answer": "Verification is a process where your school confirms that the information on your FAFSA is accurate. The Department of Education selects some FAFSA applications for verification — sometimes randomly, sometimes due to conflicting information. Your school may ask you to submit documents like tax transcripts, proof of identity, or statements about untaxed income. You must complete verification before receiving most federal aid.",
+    "source": "FSA Handbook — Verification",
+    "category": "verification"
+  },
+  {
+    "question": "What is the FSEOG grant?",
+    "answer": "The Federal Supplemental Educational Opportunity Grant (FSEOG) is a grant for undergraduates with exceptional financial need — priority is given to Pell Grant recipients. Awards range from $100 to $4,000 per year. Unlike the Pell Grant, FSEOG funds are administered directly by your school's financial aid office, so not every school participates, and funds can run out — which is why applying early matters.",
+    "source": "FSA Handbook — FSEOG",
+    "category": "grants"
+  },
+  {
+    "question": "Can I get financial aid if I attend school less than half-time?",
+    "answer": "Enrollment status affects what aid you can receive. If you're enrolled less than half-time, you're generally not eligible for Direct Subsidized or Unsubsidized Loans. You may still be eligible for Pell Grants at a reduced amount based on your enrollment intensity. Work-study and FSEOG may also be limited. Always check with your financial aid office about how your enrollment status affects your specific aid package.",
+    "source": "FSA Handbook — Enrollment Status",
+    "category": "enrollment_verification"
+  },
+  {
+    "question": "What is an income-driven repayment plan?",
+    "answer": "Income-driven repayment (IDR) plans cap your federal student loan monthly payment at a percentage of your discretionary income. There are several plans including SAVE (Saving on a Valuable Education), Pay As You Earn (PAYE), Income-Based Repayment (IBR), and Income-Contingent Repayment (ICR). After 20 to 25 years of qualifying payments (10 years for Public Service Loan Forgiveness), any remaining balance may be forgiven.",
+    "source": "StudentAid.gov — Repayment Plans",
+    "category": "loans"
+  },
+  {
+    "question": "What is the FAFSA Simplification Act?",
+    "answer": "The FAFSA Simplification Act, enacted in December 2020, made major changes to the federal student aid application process. Key changes include renaming the Expected Family Contribution (EFC) to Student Aid Index (SAI), simplifying many questions, changing how aid eligibility is calculated, expanding Pell Grant eligibility, and eliminating questions about drug convictions. Most changes took effect starting with the 2024–25 FAFSA.",
+    "source": "FSA Handbook — FAFSA Simplification",
+    "category": "fafsa_basics"
+  }
+]
