@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import uuid
 from pathlib import Path
 from typing import Iterator
 
@@ -40,7 +41,8 @@ def _chunk_text(text: str, chunk_size: int = 800, overlap: int = 150) -> list[st
 
 
 def _doc_id(content: str, source: str) -> str:
-    return hashlib.sha256(f"{source}::{content[:200]}".encode()).hexdigest()[:16]
+    digest = hashlib.sha256(f"{source}::{content[:200]}".encode()).digest()
+    return str(uuid.UUID(bytes=digest[:16]))
 
 
 def load_pdf(path: Path, doc_type: str = "fsa_handbook") -> Iterator[dict]:

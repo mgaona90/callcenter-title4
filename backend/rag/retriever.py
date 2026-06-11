@@ -66,7 +66,7 @@ class RetrievedDocument:
 
 
 def get_qdrant_client() -> AsyncQdrantClient:
-    return AsyncQdrantClient(url=QDRANT_URL)
+    return AsyncQdrantClient(url=QDRANT_URL, check_compatibility=False)
 
 
 def _rrf_merge(

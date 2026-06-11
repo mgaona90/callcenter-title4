@@ -9,12 +9,12 @@ services:
     env_file: .env
     depends_on:
       qdrant:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_healthy
     volumes:
       - ./data:/app/data
-    restart: unless-stopped
+    restart: on-failure
 
   streamlit:
     build: ./streamlit_app
@@ -36,11 +36,6 @@ services:
       - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:6333/readyz || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
   redis:
