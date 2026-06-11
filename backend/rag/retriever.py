@@ -17,12 +17,13 @@ from fastembed import SparseTextEmbedding, TextEmbedding
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
     Distance,
+    Fusion,
+    FusionQuery,
     HnswConfigDiff,
-    NamedSparseVector,
-    NamedVector,
     OptimizersConfigDiff,
     PayloadSchemaType,
     PointStruct,
+    Prefetch,
     SparseIndexParams,
     SparseVector,
     SparseVectorParams,
@@ -69,43 +70,18 @@ def get_qdrant_client() -> AsyncQdrantClient:
     return AsyncQdrantClient(url=QDRANT_URL, check_compatibility=False)
 
 
-def _rrf_merge(
-    dense_hits: list,
-    sparse_hits: list,
-    top_k: int,
-    k: int = 60,
-) -> list[tuple[str, float, dict]]:
-    """Reciprocal Rank Fusion of two ranked lists."""
-    scores: dict[str, float] = {}
-    payloads: dict[str, dict] = {}
-
-    for rank, hit in enumerate(dense_hits):
-        doc_id = str(hit.id)
-        scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
-        payloads[doc_id] = hit.payload or {}
-
-    for rank, hit in enumerate(sparse_hits):
-        doc_id = str(hit.id)
-        scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
-        if doc_id not in payloads:
-            payloads[doc_id] = hit.payload or {}
-
-    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    return [(doc_id, score, payloads[doc_id]) for doc_id, score in ranked[:top_k]]
-
-
 async def hybrid_retrieve(
     query: str,
     top_k: int = 8,
     filter_doc_type: Optional[str] = None,
 ) -> list[RetrievedDocument]:
     """
-    Hybrid dense + sparse retrieval with RRF merge.
-    Returns top_k documents ranked by combined relevance.
+    Hybrid dense + sparse retrieval using Qdrant's native RRF fusion.
+    Single query_points call — Qdrant merges the two ranked lists internally.
     """
     client = get_qdrant_client()
 
-    # Compute embeddings (CPU, no API call)
+    # Compute embeddings locally (no API call)
     dense_vec = list(_get_dense_model().embed([query]))[0].tolist()
     sparse_obj = list(_get_sparse_model().embed([query]))[0]
     sparse_vec = SparseVector(
@@ -115,37 +91,29 @@ async def hybrid_retrieve(
 
     search_limit = top_k * 3
 
-    # Run both searches concurrently
-    import asyncio
-
-    dense_task = client.search(
+    response = await client.query_points(
         collection_name=COLLECTION_NAME,
-        query_vector=NamedVector(name="dense", vector=dense_vec),
-        limit=search_limit,
+        prefetch=[
+            Prefetch(query=dense_vec, using="dense", limit=search_limit),
+            Prefetch(query=sparse_vec, using="sparse", limit=search_limit),
+        ],
+        query=FusionQuery(fusion=Fusion.RRF),
+        limit=top_k,
         with_payload=True,
     )
-    sparse_task = client.search(
-        collection_name=COLLECTION_NAME,
-        query_vector=NamedSparseVector(name="sparse", vector=sparse_vec),
-        limit=search_limit,
-        with_payload=True,
-    )
-
-    dense_hits, sparse_hits = await asyncio.gather(dense_task, sparse_task)
-
-    merged = _rrf_merge(dense_hits, sparse_hits, top_k=top_k)
 
     results = []
-    for doc_id, rrf_score, payload in merged:
+    for point in response.points:
+        payload = point.payload or {}
         if filter_doc_type and payload.get("doc_type") != filter_doc_type:
             continue
         results.append(
             RetrievedDocument(
-                id=doc_id,
+                id=str(point.id),
                 content=payload.get("content", ""),
                 source=payload.get("source", ""),
                 doc_type=payload.get("doc_type", "unknown"),
-                score=rrf_score,
+                score=point.score,
                 metadata=payload.get("metadata", {}),
             )
         )
