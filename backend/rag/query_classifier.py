@@ -78,7 +78,27 @@ async def classify_query(query: str) -> ClassificationResult:
         messages=[{"role": "user", "content": _PROMPT.format(query=query)}],
     )
     raw = message.content[0].text.strip()
-    data = json.loads(raw)
+
+    # Strip markdown code fences if model wrapped the JSON
+    if raw.startswith("```"):
+        lines = raw.split("\n")
+        raw = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+    raw = raw.strip()
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        # Fallback: extract first {...} block with regex
+        import re
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+        if match:
+            data = json.loads(match.group())
+        else:
+            # Last resort: treat as Tier 1 and log
+            import logging
+            logging.getLogger(__name__).warning("Classifier returned unparseable output: %s", raw[:200])
+            return ClassificationResult(tier=QueryTier.SIMPLE_FAQ, confidence=0.5, reasoning="parse fallback")
+
     return ClassificationResult(
         tier=QueryTier(int(data["tier"])),
         confidence=float(data["confidence"]),

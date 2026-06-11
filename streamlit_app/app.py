@@ -276,19 +276,20 @@ with col_chat:
 
     if submitted and user_input.strip():
         query = user_input.strip()
-        st.session_state.messages.append({"role": "user", "content": query})
 
         with st.spinner("Alex is thinking..."):
             result = _send_message(query)
 
         if result:
+            st.session_state.messages.append({"role": "user", "content": query})
             st.session_state.messages.append({
                 "role": "assistant",
                 "content": result["response"],
                 "escalated": result["escalated"],
             })
             st.session_state.last_meta = result
-        st.rerun()
+            st.rerun()
+        # If result is None, st.error() already shown by _send_message — don't rerun so it stays visible
 
 
 # ── Metadata panel ────────────────────────────────────────────────────────────
