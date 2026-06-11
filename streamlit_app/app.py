@@ -175,9 +175,9 @@ with st.sidebar:
     # Backend status
     backend_ok = _check_backend()
     if backend_ok:
-        st.success("Backend connected", icon="✓")
+        st.success("Backend connected", icon="✅")
     else:
-        st.error("Backend offline", icon="✗")
+        st.error("Backend offline", icon="❌")
 
     st.divider()
 
@@ -323,9 +323,9 @@ with col_meta:
 
         # Escalation flag
         if meta["escalated"]:
-            st.error("Escalated to human advisor", icon="⚠")
+            st.error("Escalated to human advisor", icon="⚠️")
         else:
-            st.success("Answered by AI", icon="✓")
+            st.success("Answered by AI", icon="✅")
 
         st.markdown("---")
 
